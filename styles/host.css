@@ -1,0 +1,11 @@
+body.host { font-size: 1.35rem; }
+.host .wrap { max-width: 960px; }
+.host h1 { font-size: 2.4rem; }
+.host h2 { font-size: 1.8rem; margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--line); }
+.host table { width: 100%; border-collapse: collapse; }
+.host th, .host td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.host .say { background: #fff8e6; border-left: 6px solid var(--warn); padding: 12px 16px; margin: 12px 0; }
+.host .say::before { content: "말하기: "; font-weight: 700; }
+.host .code { font-family: ui-monospace, Menlo, monospace; font-size: 3rem; font-weight: 800; letter-spacing: 0.1em; }
+.host ol li, .host ul li { margin: 8px 0; }
+@media print { .host h2 { break-before: page; } .no-print { display: none; } }

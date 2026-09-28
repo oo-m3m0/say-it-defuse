@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>진행자 안내 — 말로 풀어라</title><link rel="stylesheet" href="styles/base.css"><link rel="stylesheet" href="styles/host.css"></head>
+<body class="host"><div class="wrap">
+<h1>진행자 안내</h1>
+<p class="muted">총 40분. 30분이면 R3를 뺀다. 이 페이지는 프로젝터에 띄우거나 인쇄해서 쓴다.</p>
+<table><tr><th>구간</th><th>시간</th><th>내용</th></tr>
+<tr><td>규칙 설명</td><td>5분</td><td>역할, 화면 금지, 코드 입력</td></tr>
+<tr><td>R1</td><td>5분</td><td>모듈 3개</td></tr>
+<tr><td>교대</td><td>2분</td><td>해체자 바꾸기, 한 줄 소감</td></tr>
+<tr><td>R2</td><td>6분</td><td>모듈 4개</td></tr>
+<tr><td>교대</td><td>2분</td><td>해체자 바꾸기</td></tr>
+<tr><td>R3</td><td>7분</td><td>모듈 5개</td></tr>
+<tr><td>디브리핑</td><td>10분</td><td>아래 질문</td></tr></table>
+
+<h2>1. 규칙 설명 (5분)</h2>
+<ol>
+<li>4~6명씩 팀. 팀마다 <strong>해체자 1명</strong>, 나머지는 <strong>전문가</strong>.</li>
+<li>해체자는 폰으로 <strong>장치 화면</strong>을 연다. 전문가는 폰으로 <strong>설명서</strong>를 연다. (사이트 첫 화면에서 고른다)</li>
+<li><strong>서로 화면을 보여주면 안 된다.</strong> 해체자는 설명서를 볼 수 없고, 전문가는 장치를 볼 수 없다. 말로만 한다.</li>
+<li>제한 시간 안에 모든 모듈을 해제하면 성공. <strong>실수 3번</strong>이거나 시간이 끝나면 폭발.</li>
+<li>장치 맨 아래에 시리얼, 배터리, 표시등이 있다. 설명서 규칙이 이걸 자주 물어본다. 전문가가 먼저 물어봐야 한다.</li>
+</ol>
+<div class="say">"지금부터 여러분은 같은 것을 보고 있다고 착각하게 됩니다. 그 순간을 기억해 두세요."</div>
+
+<h2>2. 라운드 진행</h2>
+<p>해체자에게 코드를 부른다. 모든 팀이 입력한 것을 확인한 뒤 "시작"을 외친다. 전문가는 설명서에서 같은 라운드를 고른다.</p>
+<p class="code">R1</p><p class="muted">모듈 3개, 5분. 전문가는 설명서를 미리 1분 읽어도 된다.</p>
+<p class="code">R2</p><p class="muted">모듈 4개, 6분. 해체자 교대. 기호 키패드가 추가된다.</p>
+<p class="code">R3</p><p class="muted">모듈 5개, 7분. 해체자 교대. 다이얼은 물어볼 것이 많다.</p>
+<p>같은 라운드를 다시 돌리려면 <strong>R2-B</strong>처럼 뒤에 글자를 붙인다. 다른 장치가 나온다.</p>
+<p>결과는 해체자 화면에 크게 뜬다(성공/폭발, 남은 시간, 실수 수). 팀별로 부르게 해서 칠판에 적는다.</p>
+
+<h2>3. 디브리핑 (10분)</h2>
+<ol>
+<li>어떤 질문이 가장 효과가 있었나요? 반대로 시간을 가장 많이 잡아먹은 말은?</li>
+<li>상대가 내가 보는 것을 모른다는 사실을 언제 알아챘나요?</li>
+<li>같은 단어를 서로 다르게 이해한 순간이 있었나요? (예: "마지막", "위쪽", "켜져 있다")</li>
+<li>2라운드에서 무엇을 바꿨나요? 바꾼 이유는?</li>
+<li>우리 업무에서 "장치 맨 아래 정보"에 해당하는 것은 무엇인가요? 상대는 알 거라고 여기고 말하지 않는 것.</li>
+<li>내일부터 요청 하나를 보낼 때 무엇을 한 줄 더 붙일 건가요?</li>
+</ol>
+<div class="say">"설명서를 든 사람은 규칙을 알고, 장치를 든 사람은 상황을 압니다. 일터에서도 늘 이렇게 나뉘어 있습니다."</div>
+
+<h2 class="no-print">진행자용 답 확인</h2>
+<p class="muted no-print">막힌 팀을 도울 때 쓴다. 참가자에게 보이지 않게.</p>
+<div class="no-print"><input class="code" id="k" placeholder="R1" style="max-width:240px;display:inline-block;font-size:1.2rem;padding:8px"> <button class="btn" id="go" style="display:inline-block;width:auto;padding:8px 16px">보기</button></div>
+<pre id="ans" class="no-print" style="white-space:pre-wrap"></pre>
+</div>
+<script type="module">
+import { generateBomb } from './src/bomb.js';
+import { MODULES } from './src/modules/index.js';
+document.getElementById('go').onclick = () => {
+  const b = generateBomb(document.getElementById('k').value);
+  const out = document.getElementById('ans');
+  if (!b) { out.textContent = '코드가 잘못됨'; return; }
+  const lines = [`시리얼 ${b.edge.serial}, 배터리 ${b.edge.batteries}, 표시등 ${b.edge.indicators.map((i) => i.label + (i.on ? '(켜짐)' : '(꺼짐)')).join(' ') || '없음'}`];
+  for (const m of b.modules) {
+    const mod = MODULES[m.type]; const a = mod.solve(m.state, b.facts);
+    const seen = m.type === 'wires' ? m.state.items.join(', ') : m.type === 'button' ? `${m.state.color} ${m.state.label}` : m.type === 'keypad' ? m.state.items.join(' ') : m.type === 'password' ? m.state.slots.map((s) => s.join('')).join(' / ') : '';
+    const ans = m.type === 'wires' ? `${a + 1}번째` : m.type === 'keypad' ? a.join(' ') : m.type === 'button' ? { tap: '한 번', double: '두 번', hold: '길게' }[a] : a;
+    lines.push(`${mod.name}: [${seen}] → ${ans}`);
+  }
+  out.textContent = lines.join('\n');
+};
+</script></body></html>
