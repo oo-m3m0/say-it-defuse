@@ -1,13 +1,18 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>설명서 — 말로 풀어라</title><link rel="stylesheet" href="styles/base.css"><link rel="stylesheet" href="styles/manual.css"></head>
-<body><div class="wrap">
-<h1>전문가 설명서</h1>
-<p class="muted">해체자의 화면을 보지 말 것. 해체자에게 무엇이 보이는지 물어보고, 규칙에 따라 무엇을 할지 말로 알려준다.</p>
-<div class="card" id="pick">
-  <strong>라운드 선택</strong>
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <button class="btn" data-r="R1">R1</button><button class="btn" data-r="R2">R2</button><button class="btn" data-r="R3">R3</button>
+<title>설명서 — 말로 풀어라</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Serif+KR:wght@700&family=Noto+Sans+KR:wght@400;700;800&display=swap">
+<link rel="stylesheet" href="styles/base.css"><link rel="stylesheet" href="styles/manual.css"></head>
+<body class="manual"><div class="wrap">
+<div class="cover">
+  <div class="kicker">Expert Manual · v1.0</div>
+  <h1>장치 해제 설명서</h1>
+  <p>전문가용. 해체자에게 무엇이 보이는지 묻고, 이 설명서의 규칙에 따라 무엇을 할지 말로 알려준다.</p>
+  <div class="warn">해체자의 화면을 보지 말 것. 이 설명서를 해체자에게 보여주지 말 것.</div>
+  <div class="rounds">
+    <button data-r="R1">R1<small>모듈 3 · 5분</small></button>
+    <button data-r="R2">R2<small>모듈 4 · 6분</small></button>
+    <button data-r="R3">R3<small>모듈 5 · 7분</small></button>
   </div>
 </div>
 <div id="root"></div>
@@ -15,8 +20,8 @@
 <script type="module">
 import { renderManual } from './src/manual-render.js';
 const root = document.getElementById('root');
-const go = (r) => { renderManual(r, root); document.querySelectorAll('#pick .btn').forEach((b) => b.classList.toggle('primary', b.dataset.r === r)); location.hash = r; };
-document.querySelectorAll('#pick .btn').forEach((b) => (b.onclick = () => go(b.dataset.r)));
+const go = (r) => { renderManual(r, root); document.querySelectorAll('.rounds button').forEach((b) => b.classList.toggle('on', b.dataset.r === r)); history.replaceState(null, '', '#' + r); };
+document.querySelectorAll('.rounds button').forEach((b) => (b.onclick = () => go(b.dataset.r)));
 const initial = location.hash.replace('#', '').toUpperCase();
 if (/^R[123]$/.test(initial)) go(initial);
 </script></body></html>

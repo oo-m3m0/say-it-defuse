@@ -1,11 +1,26 @@
-body.host { font-size: 1.35rem; }
-.host .wrap { max-width: 960px; }
-.host h1 { font-size: 2.4rem; }
-.host h2 { font-size: 1.8rem; margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--line); }
+body.host { font-size: 1.3rem; background: #e9e5da; color: #1b1a17; --paper: #f8f5ec; --ink: #1b1a17; --rule: #cfc8b8; --accent: #b3341a; --muted: #6b665a;
+  background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 6px 6px; }
+.host .wrap { max-width: 980px; }
+.host .kicker { font-family: "Share Tech Mono", monospace; font-size: .8rem; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+.host h1 { font-family: "Noto Serif KR", serif; font-size: 2.6rem; margin: 4px 0 6px; }
+.host h2 { font-family: "Noto Serif KR", serif; font-size: 1.9rem; margin: 48px 0 12px; padding-top: 20px; border-top: 2px solid var(--ink); display: flex; gap: 12px; align-items: baseline; }
+.host h2 .no { font-family: "Share Tech Mono", monospace; font-size: 1.1rem; color: var(--accent); }
+.host .page { background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 20px 24px; box-shadow: 0 6px 20px rgba(0,0,0,.10); margin: 12px 0; }
 .host table { width: 100%; border-collapse: collapse; }
-.host th, .host td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
-.host .say { background: #fff8e6; border-left: 6px solid var(--warn); padding: 12px 16px; margin: 12px 0; }
-.host .say::before { content: "말하기: "; font-weight: 700; }
-.host .code { font-family: ui-monospace, Menlo, monospace; font-size: 3rem; font-weight: 800; letter-spacing: 0.1em; }
-.host ol li, .host ul li { margin: 8px 0; }
-@media print { .host h2 { break-before: page; } .no-print { display: none; } }
+.host th { text-align: left; font-family: "Share Tech Mono", monospace; font-size: .85rem; letter-spacing: .1em; color: var(--muted); padding: 8px 12px; border-bottom: 2px solid var(--ink); }
+.host td { padding: 10px 12px; border-bottom: 1px dashed var(--rule); }
+.host td:first-child { font-weight: 800; }
+.host .say { background: #fff; border-left: 6px solid var(--accent); padding: 14px 18px; margin: 16px 0; font-family: "Noto Serif KR", serif; }
+.host .say::before { content: "말하기"; display: block; font: 700 .75rem var(--font); letter-spacing: .15em; color: var(--accent); margin-bottom: 4px; }
+.host .codes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 14px 0; }
+.host .codes div { background: #0c0d10; color: #ffb020; border-radius: 8px; padding: 18px 12px; text-align: center; font-family: "Share Tech Mono", monospace; font-size: 3.4rem; text-shadow: 0 0 10px rgba(255,176,32,.6); }
+.host .codes div small { display: block; font-size: .95rem; color: #9a9ea6; text-shadow: none; font-family: var(--font); margin-top: 6px; }
+.host ol li, .host ul li { margin: 10px 0; }
+.host .qa { counter-reset: q; list-style: none; padding: 0; }
+.host .qa li { counter-increment: q; display: grid; grid-template-columns: 2.4rem 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px dashed var(--rule); }
+.host .qa li::before { content: "Q" counter(q); font-family: "Share Tech Mono", monospace; color: var(--accent); }
+.host .tool { display: flex; gap: 10px; align-items: center; }
+.host .tool input { font-family: "Share Tech Mono", monospace; font-size: 1.3rem; padding: 10px 14px; border: 1.5px solid var(--ink); border-radius: 4px; width: 160px; text-transform: uppercase; letter-spacing: .1em; }
+.host .tool button { padding: 10px 18px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 4px; font-weight: 700; cursor: pointer; }
+.host pre { background: #0c0d10; color: #e8e6df; padding: 16px; border-radius: 8px; font-size: 1rem; white-space: pre-wrap; }
+@media print { .host h2 { break-before: page; } .no-print { display: none; } .host .page { box-shadow: none; } }

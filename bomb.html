@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>장치 — 말로 풀어라</title><link rel="stylesheet" href="styles/base.css"><link rel="stylesheet" href="styles/bomb.css"></head>
+<title>장치 — 말로 풀어라</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+KR:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="styles/base.css"><link rel="stylesheet" href="styles/bomb.css"></head>
 <body class="bomb">
 <div id="app"></div>
 <div class="flash" id="flash"></div>
@@ -8,62 +10,80 @@
 import { generateBomb } from './src/bomb.js';
 import { renderEdge, mountModule } from './src/ui/bomb-ui.js';
 import { createTimer, fmt } from './src/ui/timer.js';
-import { initAudio, strikeFeedback } from './src/ui/feedback.js';
+import { strikeFeedback } from './src/ui/feedback.js';
+import { init as initAudio, setEnabled, sfx } from './src/ui/sound.js';
 import { keepAwake } from './src/ui/wakelock.js';
 
 const app = document.getElementById('app');
 const flash = document.getElementById('flash');
 const h = (tag, cls, html) => { const el = document.createElement(tag); if (cls) el.className = cls; if (html !== undefined) el.innerHTML = html; return el; };
 const MAX_STRIKES = 3;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function showStart(msg) {
   app.innerHTML = '';
   const wrap = h('div', 'wrap start');
-  wrap.append(h('h1', '', '해체자'), h('p', 'muted', '진행자가 부르는 라운드 코드를 입력하고, "시작" 신호에 맞춰 시작을 누른다.'));
+  wrap.append(h('h1', '', 'Defuser'), h('p', 'muted', '진행자가 부르는 라운드 코드를 넣고, "시작" 신호에 맞춰 누른다.<br>이 화면을 전문가에게 보여주지 않는다.'));
   const inp = h('input', 'code'); inp.placeholder = 'R1'; inp.autocapitalize = 'characters'; inp.autocomplete = 'off';
   const btn = h('button', 'btn primary', '시작');
   const err = h('p', 'muted', msg || '');
-  const sound = h('label', 'muted', '<input type="checkbox" id="snd"> 실수할 때 소리 내기');
-  btn.onclick = () => {
+  const sound = h('label', 'muted', '<input type="checkbox" id="snd" checked> 효과음');
+  btn.onclick = async () => {
     const bomb = generateBomb(inp.value);
     if (!bomb) { err.textContent = '코드는 R1, R2, R3 (또는 R1-B 같은 변형)'; return; }
-    initAudio(); keepAwake();
-    play(bomb, sound.querySelector('input').checked);
+    initAudio(); setEnabled(sound.querySelector('input').checked); keepAwake();
+    await countdown();
+    play(bomb);
   };
   wrap.append(inp, btn, err, sound);
   app.append(wrap);
-  inp.focus();
 }
 
-function play(bomb, sound) {
+async function countdown() {
+  const c = h('div', 'count'); app.append(c);
+  for (const n of [3, 2, 1]) { c.innerHTML = `<div>${n}</div>`; sfx.count(false); await sleep(900); }
+  c.innerHTML = '<div>GO</div>'; sfx.count(true); await sleep(500);
+  c.remove();
+}
+
+function play(bomb) {
   app.innerHTML = '';
-  let strikes = 0, solved = 0, over = false;
-  const hud = h('div', 'hud');
+  let strikes = 0, solved = 0, over = false, lastBeep = -1;
+  const hud = h('div', 'hud'); const panel = h('div', 'panel');
   const time = h('div', 'time', fmt(bomb.round.seconds * 1000));
-  const sk = h('div', 'strikes'); const code = h('div', 'code', bomb.code);
-  const right = h('div'); right.append(sk, code); right.style.textAlign = 'right';
-  hud.append(time, right);
+  const right = h('div', 'right'); const sk = h('div', 'strikes'); const code = h('div', 'code', bomb.code);
+  right.append(h('div', 'lbl', 'Strikes'), sk, code);
+  panel.append(time, right); hud.append(panel);
   const wrap = h('div', 'wrap');
   const edge = h('div', 'edge');
   renderEdge(bomb.edge, edge);
   app.append(hud, wrap, edge);
 
-  const drawStrikes = () => { sk.innerHTML = Array.from({ length: MAX_STRIKES }, (_, i) => (i < strikes ? '<span class="x">✕</span>' : '○')).join(''); };
+  const drawStrikes = () => { sk.innerHTML = Array.from({ length: MAX_STRIKES }, (_, i) => `<i class="${i < strikes ? 'x' : ''}"></i>`).join(''); };
   drawStrikes();
 
-  const timer = createTimer(bomb.round.seconds, (ms) => { time.textContent = fmt(ms); time.classList.toggle('low', ms < 60000); }, () => finish(false));
+  const timer = createTimer(bomb.round.seconds, (ms) => {
+    time.textContent = fmt(ms); const low = ms < 30000; time.classList.toggle('low', low);
+    const s = Math.ceil(ms / 1000); if (low && s !== lastBeep) { lastBeep = s; sfx.beep(); }
+  }, () => finish(false));
+
   const finish = (ok) => {
     if (over) return; over = true; timer.stop();
     window.onbeforeunload = null;
+    ok ? sfx.win() : sfx.boom();
+    if (!ok) { document.body.classList.add('shake'); flash.classList.add('on'); }
     const r = h('div', 'result ' + (ok ? 'ok' : 'boom'));
     r.append(h('div', 'big', ok ? '해제 성공' : '폭발'),
-      h('div', 'sub', ok ? `남은 시간 ${fmt(timer.remaining())}, 실수 ${strikes}회` : (strikes >= MAX_STRIKES ? '실수 3회' : '시간 종료') + `, 해제한 모듈 ${solved}/${bomb.modules.length}`));
+      h('div', 'sub', ok ? '모든 모듈을 해제했다.' : strikes >= MAX_STRIKES ? '실수 3회.' : '시간 종료.'));
+    const stat = h('div', 'stat');
+    stat.append(h('div', '', `${ok ? fmt(timer.remaining()) : fmt(0)}<span>남은 시간</span>`), h('div', '', `${strikes}<span>실수</span>`), h('div', '', `${solved}/${bomb.modules.length}<span>해제</span>`));
+    r.append(stat);
     const again = h('button', 'btn', '처음으로'); again.onclick = () => showStart(); r.append(again);
-    app.append(r);
+    setTimeout(() => { flash.classList.remove('on'); document.body.classList.remove('shake'); app.append(r); }, ok ? 300 : 900);
   };
   const hooks = {
     onSolve() { if (++solved === bomb.modules.length) finish(true); },
-    onStrike() { if (over) return; strikes++; drawStrikes(); strikeFeedback(flash, sound); if (strikes >= MAX_STRIKES) finish(false); },
+    onStrike() { if (over) return; strikes++; drawStrikes(); strikeFeedback(flash); if (strikes >= MAX_STRIKES) finish(false); },
   };
   for (const m of bomb.modules) wrap.append(mountModule(m, bomb.facts, hooks));
   window.onbeforeunload = () => '진행 중인 장치가 사라집니다';
